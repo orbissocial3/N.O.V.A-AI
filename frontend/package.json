@@ -1,5 +1,5 @@
 {
-  "name": "nova-app",
+  "name": "N.O.V.A AI",
   "version": "1.0.0",
   "description": "Aplicación móvil N.O.V.A con AI, chat, planes y configuración premium",
   "main": "node_modules/expo/AppEntry.js",
