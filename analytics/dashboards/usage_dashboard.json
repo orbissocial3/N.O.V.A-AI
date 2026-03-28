@@ -1,0 +1,34 @@
+{
+  "dashboard": "usage_dashboard",
+  "version": "1.0.0",
+  "widgets": [
+    {
+      "id": "active_users",
+      "type": "metric",
+      "title": "Usuarios Activos",
+      "query": "SELECT COUNT(DISTINCT user_id) FROM usage WHERE date = CURRENT_DATE",
+      "refresh_interval": "5m"
+    },
+    {
+      "id": "requests_per_agent",
+      "type": "bar_chart",
+      "title": "Requests por Agente",
+      "query": "SELECT agent, COUNT(*) as requests FROM usage GROUP BY agent",
+      "refresh_interval": "10m"
+    },
+    {
+      "id": "errors_rate",
+      "type": "line_chart",
+      "title": "Tasa de Errores",
+      "query": "SELECT timestamp, error_count/total_requests as error_rate FROM metrics",
+      "refresh_interval": "1m"
+    },
+    {
+      "id": "avg_response_time",
+      "type": "metric",
+      "title": "Tiempo Medio de Respuesta",
+      "query": "SELECT AVG(response_time_ms) FROM usage WHERE date = CURRENT_DATE",
+      "refresh_interval": "5m"
+    }
+  ]
+}

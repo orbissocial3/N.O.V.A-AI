@@ -1,0 +1,53 @@
+{
+  "events": [
+    {
+      "id": "login_success",
+      "category": "auth",
+      "action": "login",
+      "label": "success",
+      "value": 1
+    },
+    {
+      "id": "login_failure",
+      "category": "auth",
+      "action": "login",
+      "label": "failure",
+      "value": 1
+    },
+    {
+      "id": "agent_request",
+      "category": "usage",
+      "action": "request",
+      "label": "agent",
+      "value": 1
+    },
+    {
+      "id": "payment_success",
+      "category": "billing",
+      "action": "payment",
+      "label": "success",
+      "value": 1
+    },
+    {
+      "id": "payment_failure",
+      "category": "billing",
+      "action": "payment",
+      "label": "failure",
+      "value": 1
+    },
+    {
+      "id": "error_occurred",
+      "category": "system",
+      "action": "error",
+      "label": "critical",
+      "value": 1
+    },
+    {
+      "id": "session_timeout",
+      "category": "auth",
+      "action": "session",
+      "label": "timeout",
+      "value": 1
+    }
+  ]
+}

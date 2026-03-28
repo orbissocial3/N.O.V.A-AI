@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.backend
+    container_name: nova-backend
+    restart: always
+    env_file:
+      - ./infra/docker/.env.backend
+    ports:
+      - "8000:80"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - backend_logs:/app/logs
+    networks:
+      - nova-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.frontend
+    container_name: nova-frontend
+    restart: always
+    env_file:
+      - ./infra/docker/.env.frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - nova-network
+
+  postgres:
+    image: postgres:15
+    container_name: nova-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nova_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nova-network
+
+  redis:
+    image: redis:7
+    container_name: nova-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - nova-network
+
+volumes:
+  backend_logs:
+  postgres_data:
+  redis_data:
+
+networks:
+  nova-network:
+    driver: bridge

@@ -1,0 +1,35 @@
+# --- Framework y servidor ---
+fastapi==0.115.0
+uvicorn[standard]==0.32.0   # incluye uvloop, httptools, websockets
+
+# --- Bases de datos ---
+sqlalchemy==2.0.36
+psycopg2-binary>=2.9,<3.0     # PostgreSQL
+pymongo==4.10.1             # MongoDB
+redis==5.2.0                # Redis
+
+# --- Seguridad ---
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.2               # hashing seguro adicional
+
+# --- Observabilidad y monitoring ---
+prometheus-client==0.21.0
+opentelemetry-api==1.27.0
+opentelemetry-sdk==1.27.0
+opentelemetry-exporter-otlp==1.27.0
+loguru==0.7.2               # logging avanzado
+
+# --- Configuración y utilidades ---
+python-dotenv==1.0.1
+requests==2.32.3
+email-validator==2.1.1      # validación de emails en registro/login
+
+# --- Pagos ---
+stripe==10.0.0              # integración con Stripe
+
+# --- Testing ---
+pytest==8.3.4
+httpx==0.28.1
+pytest-asyncio==0.23.8
+coverage==7.6.1             # reportes de cobertura

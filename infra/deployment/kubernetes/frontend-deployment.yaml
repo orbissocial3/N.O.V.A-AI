@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nova-frontend
+  labels:
+    app: nova-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nova-frontend
+  template:
+    metadata:
+      labels:
+        app: nova-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: your-registry/nova-frontend:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "400m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      restartPolicy: Always

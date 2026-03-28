@@ -1,0 +1,68 @@
+{
+  "app": {
+    "name": "N.O.V.A",
+    "welcome": "Bienvenido a N.O.V.A",
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "googleLogin": "Iniciar sesión con Google",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "invalidCredentials": "Credenciales inválidas",
+    "sessionExpired": "Tu sesión ha expirado, por favor inicia sesión nuevamente"
+  },
+  "plans": {
+    "title": "Selecciona tu plan",
+    "basic": "Básico",
+    "premium": "Premium",
+    "enterprise": "Empresarial",
+    "pricePerMonth": "Precio por mes",
+    "benefits": "Beneficios",
+    "selectPlan": "Seleccionar plan",
+    "currentPlan": "Tu plan actual"
+  },
+  "payment": {
+    "title": "Pago",
+    "method": "Método de pago",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "googlePlay": "Google Play Billing",
+    "confirm": "Confirmar pago",
+    "success": "Pago realizado con éxito",
+    "failure": "El pago ha fallado, inténtalo nuevamente"
+  },
+  "chat": {
+    "title": "Chat con tu agente IA",
+    "inputPlaceholder": "Escribe tu mensaje...",
+    "send": "Enviar",
+    "history": "Historial de chats",
+    "noMessages": "Aún no tienes mensajes",
+    "agentReply": "Respuesta del agente"
+  },
+  "agents": {
+    "selectorTitle": "Selecciona tu agente IA",
+    "student": "Estudiante",
+    "programmer": "Programador",
+    "secretary": "Secretaria",
+    "investor": "Inversor",
+    "creative": "Creativo"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "theme": "Tema",
+    "notifications": "Notificaciones",
+    "save": "Guardar cambios"
+  },
+  "common": {
+    "yes": "Sí",
+    "no": "No",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente"
+  }
+}

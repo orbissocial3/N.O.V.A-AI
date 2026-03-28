@@ -1,0 +1,31 @@
+# Frontend Dockerfile premium
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copiar dependencias
+COPY frontend/package.json frontend/package-lock.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar código fuente
+COPY frontend/ .
+
+# Build de producción
+RUN npm run build
+
+# --- Imagen final ---
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiar build desde builder
+COPY --from=builder /app/build ./build
+
+# Instalar servidor estático
+RUN npm install -g serve
+
+EXPOSE 3000
+
+CMD ["serve", "-s", "build", "-l", "3000"]

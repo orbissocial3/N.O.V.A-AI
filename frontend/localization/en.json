@@ -1,0 +1,68 @@
+{
+  "app": {
+    "name": "N.O.V.A",
+    "welcome": "Welcome to N.O.V.A",
+    "loading": "Loading...",
+    "error": "An error has occurred"
+  },
+  "auth": {
+    "login": "Log in",
+    "logout": "Log out",
+    "googleLogin": "Sign in with Google",
+    "email": "Email",
+    "password": "Password",
+    "invalidCredentials": "Invalid credentials",
+    "sessionExpired": "Your session has expired, please log in again"
+  },
+  "plans": {
+    "title": "Choose your plan",
+    "basic": "Basic",
+    "premium": "Premium",
+    "enterprise": "Enterprise",
+    "pricePerMonth": "Price per month",
+    "benefits": "Benefits",
+    "selectPlan": "Select plan",
+    "currentPlan": "Your current plan"
+  },
+  "payment": {
+    "title": "Payment",
+    "method": "Payment method",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "googlePlay": "Google Play Billing",
+    "confirm": "Confirm payment",
+    "success": "Payment successful",
+    "failure": "Payment failed, please try again"
+  },
+  "chat": {
+    "title": "Chat with your AI agent",
+    "inputPlaceholder": "Type your message...",
+    "send": "Send",
+    "history": "Chat history",
+    "noMessages": "No messages yet",
+    "agentReply": "Agent reply"
+  },
+  "agents": {
+    "selectorTitle": "Select your AI agent",
+    "student": "Student",
+    "programmer": "Programmer",
+    "secretary": "Secretary",
+    "investor": "Investor",
+    "creative": "Creative"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "save": "Save changes"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next"
+  }
+}

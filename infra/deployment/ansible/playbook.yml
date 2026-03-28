@@ -1,0 +1,96 @@
+---
+- name: Deploy N.O.V.A Backend
+  hosts: nova_servers
+  become: true
+
+  vars:
+    app_name: "nova-backend"
+    docker_image: "{{ lookup('env','DOCKER_IMAGE') | default('nova-backend:latest') }}"
+    app_port: 80
+    log_path: "/var/log/nova"
+    env_file: "/etc/nova/.env"
+
+  tasks:
+    # --- Dependencias del sistema ---
+    - name: Ensure apt packages are up to date
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required system packages
+      apt:
+        name:
+          - git
+          - curl
+          - ufw
+          - docker.io
+          - docker-compose
+        state: present
+
+    # --- Seguridad básica ---
+    - name: Configure firewall
+      ufw:
+        rule: allow
+        port: "{{ app_port }}"
+        proto: tcp
+
+    - name: Ensure UFW is enabled
+      ufw:
+        state: enabled
+
+    # --- Configuración de logs ---
+    - name: Create log directory
+      file:
+        path: "{{ log_path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    # --- Variables de entorno ---
+    - name: Ensure env file exists
+      copy:
+        dest: "{{ env_file }}"
+        content: |
+          ENVIRONMENT=production
+          SECRET_KEY={{ lookup('env','SECRET_KEY') | default('supersecretkey123') }}
+          POSTGRES_URL={{ lookup('env','POSTGRES_URL') }}
+          MONGO_URL={{ lookup('env','MONGO_URL') }}
+          REDIS_URL={{ lookup('env','REDIS_URL') }}
+          STRIPE_API_KEY={{ lookup('env','STRIPE_API_KEY') }}
+          PAYPAL_CLIENT_ID={{ lookup('env','PAYPAL_CLIENT_ID') }}
+          PAYPAL_SECRET={{ lookup('env','PAYPAL_SECRET') }}
+        owner: root
+        group: root
+        mode: "0600"
+
+    # --- Docker despliegue ---
+    - name: Pull latest Docker image
+      docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Stop existing container
+      block:
+        - docker_container:
+            name: "{{ app_name }}"
+            state: stopped
+      ignore_errors: true
+
+    - name: Remove existing container
+      block:
+        - docker_container:
+            name: "{{ app_name }}"
+            state: absent
+      ignore_errors: true
+
+    - name: Run N.O.V.A backend container
+      docker_container:
+        name: "{{ app_name }}"
+        image: "{{ docker_image }}"
+        restart_policy: always
+        env_file: "{{ env_file }}"
+        published_ports:
+          - "{{ app_port }}:80"
+        volumes:
+          - "{{ log_path }}:/app/logs"

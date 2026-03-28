@@ -1,0 +1,68 @@
+{
+  "app": {
+    "name": "N.O.V.A",
+    "welcome": "欢迎来到 N.O.V.A",
+    "loading": "加载中...",
+    "error": "发生错误"
+  },
+  "auth": {
+    "login": "登录",
+    "logout": "退出",
+    "googleLogin": "使用谷歌登录",
+    "email": "电子邮件",
+    "password": "密码",
+    "invalidCredentials": "凭证无效",
+    "sessionExpired": "您的会话已过期，请重新登录"
+  },
+  "plans": {
+    "title": "选择您的计划",
+    "basic": "基础",
+    "premium": "高级",
+    "enterprise": "企业",
+    "pricePerMonth": "每月价格",
+    "benefits": "福利",
+    "selectPlan": "选择计划",
+    "currentPlan": "您当前的计划"
+  },
+  "payment": {
+    "title": "支付",
+    "method": "支付方式",
+    "paypal": "贝宝",
+    "stripe": "Stripe",
+    "googlePlay": "Google Play 账单",
+    "confirm": "确认支付",
+    "success": "支付成功",
+    "failure": "支付失败，请重试"
+  },
+  "chat": {
+    "title": "与您的人工智能助手聊天",
+    "inputPlaceholder": "输入您的消息...",
+    "send": "发送",
+    "history": "聊天记录",
+    "noMessages": "暂无消息",
+    "agentReply": "助手回复"
+  },
+  "agents": {
+    "selectorTitle": "选择您的人工智能助手",
+    "student": "学生",
+    "programmer": "程序员",
+    "secretary": "秘书",
+    "investor": "投资者",
+    "creative": "创意者"
+  },
+  "settings": {
+    "title": "设置",
+    "language": "语言",
+    "theme": "主题",
+    "notifications": "通知",
+    "save": "保存更改"
+  },
+  "common": {
+    "yes": "是",
+    "no": "否",
+    "cancel": "取消",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一步"
+  }
+}

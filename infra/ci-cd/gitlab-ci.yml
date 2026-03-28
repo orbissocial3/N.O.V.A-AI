@@ -1,0 +1,117 @@
+stages:
+  - lint
+  - test
+  - build
+  - security
+  - deploy
+
+variables:
+  DOCKER_IMAGE: "$CI_REGISTRY_IMAGE/nova-backend"
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+cache:
+  paths:
+    - .cache/pip
+    - frontend/node_modules
+
+# --- Backend Lint ---
+backend-lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}
+  script:
+    - pip install flake8
+    - flake8 backend
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# --- Backend Tests ---
+backend-tests:
+  stage: test
+  image: python:${PYTHON_VERSION}
+  services:
+    - name: postgres:15
+      alias: postgres
+    - name: redis:7
+      alias: redis
+  variables:
+    POSTGRES_DB: nova_db
+    POSTGRES_USER: user
+    POSTGRES_PASSWORD: password
+  script:
+    - pip install -r backend/requirements.txt
+    - pytest --cov=backend --cov-report=xml
+  artifacts:
+    paths:
+      - coverage.xml
+    expire_in: 1 week
+
+# --- Frontend Lint ---
+frontend-lint:
+  stage: lint
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --prefix frontend
+    - npm run lint --prefix frontend
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# --- Frontend Tests ---
+frontend-tests:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --prefix frontend
+    - npm test --prefix frontend
+
+# --- Docker Build ---
+docker-build:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHA .
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHA
+    - docker tag $DOCKER_IMAGE:$CI_COMMIT_SHA $DOCKER_IMAGE:latest
+    - docker push $DOCKER_IMAGE:latest
+  only:
+    - main
+    - develop
+
+# --- Security Scan ---
+security-scan:
+  stage: security
+  image: aquasec/trivy:latest
+  script:
+    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $DOCKER_IMAGE:latest
+  needs: ["docker-build"]
+
+# --- Deploy Staging ---
+deploy-staging:
+  stage: deploy
+  script:
+    - echo "Deploying to staging..."
+    - ssh $STAGING_USER@$STAGING_SERVER "docker pull $DOCKER_IMAGE:latest && docker run -d --rm -p 8080:80 $DOCKER_IMAGE:latest"
+  environment:
+    name: staging
+    url: https://staging.nova.ai
+  only:
+    - develop
+
+# --- Deploy Production ---
+deploy-production:
+  stage: deploy
+  script:
+    - echo "Deploying to production..."
+    - ssh $PROD_USER@$PROD_SERVER "docker pull $DOCKER_IMAGE:latest && docker stop nova-backend || true && docker rm nova-backend || true && docker run -d --name nova-backend -p 80:80 $DOCKER_IMAGE:latest"
+  environment:
+    name: production
+    url: https://nova.ai
+  only:
+    - main

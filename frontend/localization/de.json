@@ -1,0 +1,68 @@
+{
+  "app": {
+    "name": "N.O.V.A",
+    "welcome": "Willkommen bei N.O.V.A",
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "googleLogin": "Mit Google anmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "invalidCredentials": "Ungültige Zugangsdaten",
+    "sessionExpired": "Deine Sitzung ist abgelaufen, bitte melde dich erneut an"
+  },
+  "plans": {
+    "title": "Wähle deinen Plan",
+    "basic": "Basis",
+    "premium": "Premium",
+    "enterprise": "Unternehmen",
+    "pricePerMonth": "Preis pro Monat",
+    "benefits": "Vorteile",
+    "selectPlan": "Plan auswählen",
+    "currentPlan": "Dein aktueller Plan"
+  },
+  "payment": {
+    "title": "Zahlung",
+    "method": "Zahlungsmethode",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "googlePlay": "Google Play Billing",
+    "confirm": "Zahlung bestätigen",
+    "success": "Zahlung erfolgreich",
+    "failure": "Zahlung fehlgeschlagen, bitte versuche es erneut"
+  },
+  "chat": {
+    "title": "Chat mit deinem KI-Agenten",
+    "inputPlaceholder": "Schreibe deine Nachricht...",
+    "send": "Senden",
+    "history": "Chatverlauf",
+    "noMessages": "Noch keine Nachrichten",
+    "agentReply": "Antwort des Agenten"
+  },
+  "agents": {
+    "selectorTitle": "Wähle deinen KI-Agenten",
+    "student": "Student",
+    "programmer": "Programmierer",
+    "secretary": "Sekretärin",
+    "investor": "Investor",
+    "creative": "Kreativ"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "theme": "Design",
+    "notifications": "Benachrichtigungen",
+    "save": "Änderungen speichern"
+  },
+  "common": {
+    "yes": "Ja",
+    "no": "Nein",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter"
+  }
+}

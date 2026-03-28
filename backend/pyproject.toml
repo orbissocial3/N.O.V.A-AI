@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "nova-backend"
+version = "1.0.0"
+description = "N.O.V.A Backend - Plataforma de Inteligencia Artificial con FastAPI, SQLAlchemy, Redis y más."
+authors = ["N.O.V.A Team <support@nova.ai>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# --- Framework principal ---
+fastapi = "^0.115.0"
+uvicorn = "^0.30.0"
+
+# --- Bases de datos ---
+sqlalchemy = "^2.0.29"
+psycopg2-binary = "^2.9.9"   # PostgreSQL
+pymongo = "^4.8.0"           # MongoDB
+redis = "^5.0.3"             # Redis
+
+# --- Seguridad ---
+python-jose = "^3.3.0"       # JWT
+passlib = "^1.7.4"           # Hashing de contraseñas
+bcrypt = "^4.1.2"
+
+# --- Configuración y validación ---
+pydantic = "^2.6.4"
+python-dotenv = "^1.0.1"
+
+# --- Observabilidad ---
+loguru = "^0.7.2"
+prometheus-client = "^0.20.0"
+opentelemetry-api = "^1.24.0"
+opentelemetry-sdk = "^1.24.0"
+
+# --- Pagos ---
+stripe = "^10.0.0"
+requests = "^2.31.0"
+
+# --- Correo ---
+smtplib = "*"   # Incluido en stdlib, pero se puede usar a través de email.message
+
+# --- Testing ---
+pytest = "^8.1.1"
+httpx = "^0.27.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+mypy = "^1.9.0"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"

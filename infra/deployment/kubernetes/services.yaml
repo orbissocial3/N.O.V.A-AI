@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nova-backend-service
+  labels:
+    app: nova-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: nova-backend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nova-frontend-service
+  labels:
+    app: nova-frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: nova-frontend
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
