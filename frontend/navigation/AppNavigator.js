@@ -1,13 +1,12 @@
 /**
  * AppNavigator.js
  * ----------------------------
- * Navegador principal de la aplicación N.O.V.A.
- * Define:
- *  - Splash inicial
- *  - Stack de autenticación (Login, Registro, Recuperar contraseña)
- *  - Stack principal (Home, Chat, Planes, Configuración)
- *  - Redirección según estado de sesión
- *  - Animaciones premium en transiciones
+ * Navegador principal de la aplicación N.O.V.A
+ * - Splash inicial con animación premium
+ * - Stack de autenticación (Login, Registro, Recuperar contraseña)
+ * - Stack principal (Home, Chat, Planes, Configuración)
+ * - Redirección según estado de sesión
+ * - Transiciones empresariales y fluidas
  */
 
 import React from "react";
@@ -15,7 +14,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // Pantallas de autenticación
 import LoginScreen from "../screens/LoginScreen";
-// Opcionales para futuro crecimiento
+// Preparado para expansión futura
 // import RegisterScreen from "../screens/RegisterScreen";
 // import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 
@@ -35,6 +34,8 @@ export default function AppNavigator({ isAuthenticated }) {
       screenOptions={{
         headerShown: false,
         animation: "fade", // transición premium
+        gestureEnabled: true, // gestos fluidos
+        animationDuration: 500, // velocidad elegante
       }}
     >
       {/* Pantalla inicial de carga */}

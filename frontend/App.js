@@ -29,8 +29,8 @@ import AppNavigator from "./navigation/AppNavigator";
 import PrivacyScreen from "./app/screens/PrivacyScreen";
 
 // Servicios
-import auth from "./services/auth"; // Manejo de login/logout
-import api from "./services/api";   // Conexión al backend
+import auth from "./services/auth";   // Manejo de login/logout
+import api from "./services/api";     // Conexión al backend
 import logger from "./services/logger"; // Logging centralizado
 
 // Internacionalización
@@ -57,6 +57,8 @@ export default function App() {
 
     const initializeApp = async () => {
       try {
+        logger.info("[APP] Inicializando aplicación...");
+
         // Revisar aceptación de política
         const accepted = await AsyncStorage.getItem("privacyAccepted");
         setPrivacyAccepted(accepted === "true");
@@ -69,10 +71,13 @@ export default function App() {
           });
           if (response.status === 200) {
             setIsAuthenticated(true);
+            logger.info("[APP] Sesión validada correctamente");
+          } else {
+            logger.warning("[APP] Token inválido o expirado");
           }
         }
       } catch (error) {
-        logger.error("Error inicializando la app", error);
+        logger.error("[APP] Error inicializando la app", error);
       } finally {
         setLoading(false);
       }

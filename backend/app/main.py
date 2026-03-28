@@ -46,7 +46,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger("NOVA")
 
-# Crear instancia de FastAPI con metadatos
+# --- Seguridad extra: Rate limiting contra fuerza bruta ---
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+limiter = Limiter(key_func=get_remote_address)
+
+# Crear instancia de FastAPI con metadatos y docs desactivadas en producción
 app = FastAPI(
     title=settings.APP_NAME,
     description="Plataforma de Inteligencia Artificial con agentes especializados (Estudiante, Programador, Secretario, Inversor, Creativo).",
@@ -60,7 +67,22 @@ app = FastAPI(
         "name": "Propietario N.O.V.A",
         "url": "https://nova.ai/license",
     },
+    docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc",
+    openapi_url=None if settings.ENVIRONMENT == "production" else "/openapi.json",
 )
+
+app.state.limiter = limiter
+
+# Manejo de errores de rate limiting
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    logger.warning(f"[SECURITY] Rate limit excedido | ip={get_remote_address(request)} endpoint={request.url.path}")
+    alerts.send_alert(f"Rate limit excedido en {request.url.path}", severity="WARNING")
+    return JSONResponse(
+        status_code=429,
+        content={"error": "Demasiados intentos, espera antes de volver a intentar."},
+    )
 
 # --- Middlewares ---
 app.add_middleware(AuditMiddleware)  # Auditoría de todas las peticiones
@@ -75,12 +97,12 @@ async def monitoring_middleware(request: Request, call_next):
 
     metrics.record_request(method, endpoint)
 
-    with tracing.start_span(f"{method} {endpoint}"):
+    with tracing.start_span(f"{method} {endpoint}", {"ip": get_remote_address(request)}):
         try:
             response = await call_next(request)
         except Exception as exc:
-            metrics.record_error(endpoint)
-            alerts.send_alert(f"Error en {endpoint}: {str(exc)}", severity="ERROR")
+            metrics.record_error(endpoint, severity="ERROR")
+            alerts.send_alert(f"Error en {endpoint}: {str(exc)}", severity="ERROR", context="middleware")
             logger.error(f"[MONITORING] Error en {endpoint}: {exc}")
             raise
 
@@ -93,7 +115,7 @@ async def monitoring_middleware(request: Request, call_next):
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"❌ Error en {request.url}: {str(exc)}")
-    alerts.send_alert(f"Excepción global en {request.url}: {str(exc)}", severity="CRITICAL")
+    alerts.send_alert(f"Excepción global en {request.url}: {str(exc)}", severity="CRITICAL", context="global")
     return JSONResponse(
         status_code=500,
         content={"error": "Error interno del servidor", "details": str(exc)},
@@ -115,16 +137,22 @@ def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": settings.APP_NAME, "version": settings.APP_VERSION}
+    return {
+        "status": "ok",
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "environment": settings.ENVIRONMENT
+    }
 
 # --- Eventos de ciclo de vida ---
 @app.on_event("startup")
 async def startup_event():
     logger.info("🚀 N.O.V.A iniciado correctamente")
     logger.info(f"Configuración cargada: entorno={settings.ENVIRONMENT}, DB={settings.POSTGRES_URL}")
-    alerts.send_alert("Servidor iniciado", severity="INFO")
+    alerts.send_alert("Servidor iniciado", severity="INFO", context="lifecycle")
+    metrics.set_active_users(0)  # inicializar gauge de usuarios activos
 
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("🛑 N.O.V.A detenido")
-    alerts.send_alert("Servidor detenido", severity="INFO")
+    alerts.send_alert("Servidor detenido", severity="INFO", context="lifecycle")

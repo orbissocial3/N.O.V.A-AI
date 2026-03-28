@@ -11,12 +11,16 @@ Centraliza todas las variables de entorno y parámetros:
 - Almacenamiento
 - APIs externas
 - Internacionalización
+- Empresarial
 """
 
 import os
 from typing import List
 from pydantic import Field, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
+from app.utils.logger import get_logger
+
+logger = get_logger("config")
 
 class Settings(BaseSettings):
     # --- General ---
@@ -101,9 +105,29 @@ class Settings(BaseSettings):
     @field_validator("SECRET_KEY")
     @classmethod
     def validate_secret_key(cls, v: str) -> str:
-        if not v or len(v) < 12:
-            raise ValueError("SECRET_KEY debe tener al menos 12 caracteres")
+        if not v or len(v) < 32:
+            raise ValueError("SECRET_KEY debe tener al menos 32 caracteres para máxima seguridad")
+        return v
+
+    @field_validator("JWT_SECRET")
+    @classmethod
+    def validate_jwt_secret(cls, v: str) -> str:
+        if not v or len(v) < 32:
+            raise ValueError("JWT_SECRET debe tener al menos 32 caracteres")
+        return v
+
+    @field_validator("SUPPORTED_LANGUAGES")
+    @classmethod
+    def validate_languages(cls, v: List[str]) -> List[str]:
+        if not v or "es" not in v:
+            raise ValueError("Debe incluir al menos 'es' como idioma soportado")
         return v
 
 # Instancia global
 settings = Settings()
+
+# Logging de configuración cargada
+logger.info(
+    f"[CONFIG] Configuración cargada | App={settings.APP_NAME} v{settings.APP_VERSION} | "
+    f"Entorno={settings.ENVIRONMENT} | DB={settings.POSTGRES_URL} | Storage={settings.STORAGE_PROVIDER}"
+)
