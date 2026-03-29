@@ -2,10 +2,10 @@
  * SplashScreen.js
  * ----------------------------
  * Pantalla inicial de N.O.V.A
- * - Animación cautivadora y premium
- * - Logo y nombre con fade-in elegante
- * - Loader con sensación empresarial
- * - Experiencia impecable y emocional
+ * - Fondo degradado premium (azul → púrpura)
+ * - Logo y nombre con animación elegante
+ * - Loader en cian brillante
+ * - Footer estilo META con branding corporativo
  */
 
 import React, { useEffect, useRef } from "react";
@@ -17,6 +17,7 @@ import {
   Animated,
   Image
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient"; // para el degradado
 import { useTranslation } from "react-i18next";
 
 export default function SplashScreen() {
@@ -41,7 +42,10 @@ export default function SplashScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={["#0A0F2C", "#3B0A45"]} // azul profundo → púrpura premium
+      style={styles.container}
+    >
       {/* Animación de logo y nombre */}
       <Animated.View
         style={{
@@ -51,7 +55,7 @@ export default function SplashScreen() {
         }}
       >
         <Image
-          source={require("../assets/logo.png")} // ruta corregida
+          source={require("../assets/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -59,17 +63,30 @@ export default function SplashScreen() {
         <Text style={styles.subtitle}>{t("app.tagline")}</Text>
       </Animated.View>
 
-      {/* Loader */}
-      <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 30 }} />
+      {/* Loader premium */}
+      <ActivityIndicator size="large" color="#00CFFF" style={{ marginTop: 30 }} />
       <Text style={styles.text}>{t("app.loading")}</Text>
-    </View>
+
+      {/* Footer estilo META */}
+      <View style={styles.footer}>
+        <Image
+          source={require("../assets/logo.png")}
+          style={styles.footerLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.footerText}>From Nova Artificial Intelligence Systems</Text>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#F9FAFB" },
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
   logo: { width: 160, height: 160, marginBottom: 15 },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 5, color: "#1A1A1A" },
-  subtitle: { fontSize: 16, color: "#555", marginBottom: 20, textAlign: "center" },
-  text: { marginTop: 10, fontSize: 16, color: "#333" }
+  title: { fontSize: 30, fontWeight: "bold", marginBottom: 5, color: "#fff", letterSpacing: 1 },
+  subtitle: { fontSize: 16, color: "#ddd", marginBottom: 20, textAlign: "center" },
+  text: { marginTop: 10, fontSize: 16, color: "#fff" },
+  footer: { position: "absolute", bottom: 40, flexDirection: "row", alignItems: "center" },
+  footerLogo: { width: 22, height: 22, marginRight: 8 },
+  footerText: { color: "#bbb", fontSize: 14 }
 });
