@@ -1,4 +1,3 @@
-# backend/app/services/agents/student.py
 """
 Agente Estudiante Premium
 -------------------------
@@ -17,9 +16,9 @@ logger = get_logger("student_agent")
 
 # Endpoints oficiales
 WIKIPEDIA_API = "https://en.wikipedia.org/api/rest_v1/page/summary/"
+OPENLIBRARY_API = "https://openlibrary.org/search.json"
 WOLFRAM_API = "http://api.wolframalpha.com/v1/result"
 NASA_API = "https://api.nasa.gov/planetary/apod"
-OPENLIBRARY_API = "https://openlibrary.org/search.json"
 
 # -----------------------------
 # Funciones de integración
@@ -39,6 +38,7 @@ def fetch_wikipedia_summary(topic: str) -> str:
         logger.error(f"[STUDENT] Error Wikipedia: {e}")
         return "No pude obtener información en Wikipedia en este momento."
 
+
 def fetch_openlibrary_books(query: str) -> str:
     """Busca referencias académicas en Open Library."""
     try:
@@ -54,6 +54,7 @@ def fetch_openlibrary_books(query: str) -> str:
         logger.error(f"[STUDENT] Error OpenLibrary: {e}")
         return "No pude obtener referencias académicas en este momento."
 
+
 def fetch_wolfram_answer(query: str) -> str:
     """Resuelve consultas científicas y matemáticas con Wolfram Alpha."""
     try:
@@ -67,19 +68,28 @@ def fetch_wolfram_answer(query: str) -> str:
         logger.error(f"[STUDENT] Error Wolfram: {e}")
         return "No pude resolver la consulta científica."
 
-def fetch_nasa_info() -> str:
+
+def fetch_nasa_info(date: str = None, hd: bool = False) -> str:
     """Obtiene información astronómica desde NASA (APOD)."""
     try:
         api_key = os.getenv("NASA_API_KEY", "DEMO_KEY")
-        response = requests.get(NASA_API, params={"api_key": api_key}, timeout=10)
+        params = {"api_key": api_key}
+        if date:
+            params["date"] = date
+        if hd:
+            params["hd"] = "True"
+
+        response = requests.get(NASA_API, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
         title = data.get("title", "Astronomía")
         explanation = data.get("explanation", "No hay explicación disponible.")
-        return f"🌌 {title}:\n{explanation}"
+        url = data.get("url", "")
+        return f"🌌 {title}:\n{explanation}\n🔗 {url}"
     except Exception as e:
         logger.error(f"[STUDENT] Error NASA: {e}")
         return "No pude obtener información astronómica."
+
 
 # -----------------------------
 # Agente principal

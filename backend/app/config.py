@@ -1,4 +1,3 @@
-# backend/app/config.py
 """
 Configuración global de N.O.V.A
 --------------------------------
@@ -15,7 +14,7 @@ Centraliza todas las variables de entorno y parámetros:
 """
 
 import os
-from typing import List
+from typing import List, Dict
 from pydantic import Field, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 from app.utils.logger import get_logger
@@ -76,14 +75,28 @@ class Settings(BaseSettings):
     NEWS_API_KEY: str = Field(default=os.getenv("NEWS_API_KEY", ""))
     GOOGLE_SEARCH_API_KEY: str = Field(default=os.getenv("GOOGLE_SEARCH_API_KEY", ""))
     GOOGLE_SEARCH_ENGINE_ID: str = Field(default=os.getenv("GOOGLE_SEARCH_ENGINE_ID", ""))
-    WIKIMEDIA_API_URL: str = Field(default=os.getenv("WIKIMEDIA_API_URL", "https://en.wikipedia.org/w/api.php"))
+
+    # Wikimedia por idioma
+    WIKIMEDIA_ENDPOINTS: Dict[str, str] = {
+        "es": os.getenv("WIKIMEDIA_API_ES", "https://es.wikipedia.org/api/rest_v1/page/summary/"),
+        "en": os.getenv("WIKIMEDIA_API_EN", "https://en.wikipedia.org/api/rest_v1/page/summary/"),
+        "it": os.getenv("WIKIMEDIA_API_IT", "https://it.wikipedia.org/api/rest_v1/page/summary/"),
+        "fr": os.getenv("WIKIMEDIA_API_FR", "https://fr.wikipedia.org/api/rest_v1/page/summary/"),
+        "de": os.getenv("WIKIMEDIA_API_DE", "https://de.wikipedia.org/api/rest_v1/page/summary/"),
+        "zh": os.getenv("WIKIMEDIA_API_ZH", "https://zh.wikipedia.org/api/rest_v1/page/summary/"),
+        "pt": os.getenv("WIKIMEDIA_API_PT", "https://pt.wikipedia.org/api/rest_v1/page/summary/")
+    }
+
     YOUTUBE_API_KEY: str = Field(default=os.getenv("YOUTUBE_API_KEY", ""))
     TWITTER_BEARER_TOKEN: str = Field(default=os.getenv("TWITTER_BEARER_TOKEN", ""))
     GITHUB_API_TOKEN: str = Field(default=os.getenv("GITHUB_API_TOKEN", ""))
     STACKEXCHANGE_API_KEY: str = Field(default=os.getenv("STACKEXCHANGE_API_KEY", ""))
 
+    # NASA
+    NASA_API_KEY: str = Field(default=os.getenv("NASA_API_KEY", ""))
+
     # --- Internacionalización ---
-    SUPPORTED_LANGUAGES: List[str] = ["es", "en", "fr"]
+    SUPPORTED_LANGUAGES: List[str] = ["es", "en", "fr", "it", "de", "zh", "pt"]
 
     # --- Empresarial ---
     ENABLE_2FA: bool = True

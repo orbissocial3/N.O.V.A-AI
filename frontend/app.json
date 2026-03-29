@@ -1,5 +1,34 @@
 {
-  "android": {
-    "package": "com.anonymous.novaapp"
+  "expo": {
+    "name": "N.O.V.A AI",
+    "slug": "nova-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.anonymous.novaapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#000000"
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.novaapp"
+    },
+    "web": {
+      "favicon": "./assets/logo.png"
+    }
   }
 }
