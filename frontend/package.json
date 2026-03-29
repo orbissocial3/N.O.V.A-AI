@@ -1,7 +1,7 @@
 {
   "name": "N.O.V.A AI",
   "version": "1.0.0",
-  "description": "Aplicación móvil N.O.V.A con AI, chat, planes y configuración premium",
+  "description": "Aplicación móvil N.O.V.A con AI, chat, planes y configuración premium de todos y para todos",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
