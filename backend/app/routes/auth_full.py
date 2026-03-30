@@ -8,10 +8,12 @@ from jose import jwt
 from passlib.context import CryptContext
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from starlette.config import Config
 
 from app.db.postgresql import get_db
 from app.models.user import User
 from app.utils.logger import get_logger
+from app.config import settings  # usamos tu Settings global
 
 router = APIRouter(
     prefix="/auth",
@@ -20,15 +22,16 @@ router = APIRouter(
 
 logger = get_logger("auth")
 
-# Configuración JWT
-SECRET_KEY = "CAMBIA_ESTO_POR_UNA_CLAVE_SECRETA_LARGA"
+# Configuración JWT desde settings
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.TOKEN_EXPIRATION_HOURS
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Rate limiting (anti fuerza bruta)
-limiter = Limiter(key_func=get_remote_address)
+# Rate limiting (anti fuerza bruta) con lectura UTF-8 del .env
+config = Config(".env", encoding="utf-8")
+limiter = Limiter(key_func=get_remote_address, config=config)
 
 # --- Modelos ---
 class LoginRequest(BaseModel):
