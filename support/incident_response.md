@@ -50,7 +50,7 @@
 ---
 
 ## Tiempo de Respuesta Objetivo (SLA)
-- Críticos: < 30 minutos.
-- Altos: < 2 horas.
-- Medios: < 24 horas.
+- Críticos: < 50 minutos.
+- Altos: < 3 horas.
+- Medios: < 48 horas.
 - Bajos: < 72 horas.
