@@ -76,16 +76,27 @@ class Settings(BaseSettings):
     GOOGLE_SEARCH_API_KEY: str = Field(default=os.getenv("GOOGLE_SEARCH_API_KEY", ""))
     GOOGLE_SEARCH_ENGINE_ID: str = Field(default=os.getenv("GOOGLE_SEARCH_ENGINE_ID", ""))
 
-    # Wikimedia por idioma
-    WIKIMEDIA_ENDPOINTS: Dict[str, str] = {
-        "es": os.getenv("WIKIMEDIA_API_ES", "https://es.wikipedia.org/api/rest_v1/page/summary/"),
-        "en": os.getenv("WIKIMEDIA_API_EN", "https://en.wikipedia.org/api/rest_v1/page/summary/"),
-        "it": os.getenv("WIKIMEDIA_API_IT", "https://it.wikipedia.org/api/rest_v1/page/summary/"),
-        "fr": os.getenv("WIKIMEDIA_API_FR", "https://fr.wikipedia.org/api/rest_v1/page/summary/"),
-        "de": os.getenv("WIKIMEDIA_API_DE", "https://de.wikipedia.org/api/rest_v1/page/summary/"),
-        "zh": os.getenv("WIKIMEDIA_API_ZH", "https://zh.wikipedia.org/api/rest_v1/page/summary/"),
-        "pt": os.getenv("WIKIMEDIA_API_PT", "https://pt.wikipedia.org/api/rest_v1/page/summary/")
-    }
+    # --- Wikimedia por idioma (campos individuales) ---
+    WIKIMEDIA_API_ES: str = Field(default=os.getenv("WIKIMEDIA_API_ES", "https://es.wikipedia.org/api/rest_v1/page/summary/"))
+    WIKIMEDIA_API_EN: str = Field(default=os.getenv("WIKIMEDIA_API_EN", "https://en.wikipedia.org/api/rest_v1/page/summary/"))
+    WIKIMEDIA_API_IT: str = Field(default=os.getenv("WIKIMEDIA_API_IT", "https://it.wikipedia.org/api/rest_v1/page/summary/"))
+    WIKIMEDIA_API_FR: str = Field(default=os.getenv("WIKIMEDIA_API_FR", "https://fr.wikipedia.org/api/rest_v1/page/summary/"))
+    WIKIMEDIA_API_DE: str = Field(default=os.getenv("WIKIMEDIA_API_DE", "https://de.wikipedia.org/api/rest_v1/page/summary/"))
+    WIKIMEDIA_API_ZH: str = Field(default=os.getenv("WIKIMEDIA_API_ZH", "https://zh.wikipedia.org/api/rest_v1/page/summary/"))
+    WIKIMEDIA_API_PT: str = Field(default=os.getenv("WIKIMEDIA_API_PT", "https://pt.wikipedia.org/api/rest_v1/page/summary/"))
+
+    # Diccionario centralizado
+    @property
+    def WIKIMEDIA_ENDPOINTS(self) -> Dict[str, str]:
+        return {
+            "es": self.WIKIMEDIA_API_ES,
+            "en": self.WIKIMEDIA_API_EN,
+            "it": self.WIKIMEDIA_API_IT,
+            "fr": self.WIKIMEDIA_API_FR,
+            "de": self.WIKIMEDIA_API_DE,
+            "zh": self.WIKIMEDIA_API_ZH,
+            "pt": self.WIKIMEDIA_API_PT,
+        }
 
     YOUTUBE_API_KEY: str = Field(default=os.getenv("YOUTUBE_API_KEY", ""))
     TWITTER_BEARER_TOKEN: str = Field(default=os.getenv("TWITTER_BEARER_TOKEN", ""))
@@ -105,7 +116,7 @@ class Settings(BaseSettings):
     MAX_REQUESTS_ENTERPRISE: int = 50000
 
     # --- Configuración Pydantic v2 ---
-    model_config = ConfigDict(env_file=".env", case_sensitive=True)
+    model_config = ConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
     # --- Validadores ---
     @field_validator("ENVIRONMENT")
