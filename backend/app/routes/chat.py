@@ -1,7 +1,7 @@
 # backend/app/routes/chat.py
 """
-Rutas de Chat
--------------
+Rutas de Chat Premium
+---------------------
 Gestión de conversaciones entre usuarios y agentes IA.
 Incluye autenticación, rate limits, logging, auditoría, métricas,
 trazabilidad, alertas y persistencia con caché.
@@ -26,8 +26,8 @@ from app.cache.redis_cache import set_cache, get_cache, delete_cache
 from app.services.agents.student import student_agent
 from app.services.agents.programmer import programmer_agent
 from app.services.agents.secretary import secretary_agent
-from backend.app.services.agents.investor_premium import investor_agent
-from backend.app.services.agents.creative_premium import creative_agent
+from app.services.agents.investor_premium import investor_agent
+from app.services.agents.creative_premium import creative_agent
 
 import datetime, time
 
@@ -70,12 +70,16 @@ def get_user_chats(
 def create_chat(
     user_id: int,
     agent_id: int,
-    message: str
+    message: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Versión simplificada para pruebas.
-    No requiere autenticación ni base de datos.
+    Crear un nuevo chat con persistencia y auditoría.
     """
+    # Rate limit
+    check_rate_limit(user_id)
+
     # Seleccionar agente IA
     agent_map = {
         1: student_agent,
@@ -85,47 +89,27 @@ def create_chat(
         5: creative_agent
     }
 
-    agent_fn = agent_map.get(agent_id, None)
-
+    agent_fn = agent_map.get(agent_id)
     if not agent_fn:
-        return {"error": "Agente no reconocido"}
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Agente no reconocido")
 
-    response = agent_fn(message)
+    start = time.time()
+    endpoint = "/chat"
 
-    return {
-        "user_id": user_id,
-        "agent_id": agent_id,
-        "message": message,
-        "response": response
-    }
-
-    # Seleccionar agente IA
-    agent_name = agent.name.lower()
-    with tracing.start_span(f"chat:{agent_name}"):
+    with tracing.start_span(f"chat:agent_{agent_id}"):
         try:
-            if agent_name == "estudiante":
-                response = student_agent(message)
-            elif agent_name == "programador":
-                response = programmer_agent(message)
-            elif agent_name == "secretario":
-                response = secretary_agent(message)
-            elif agent_name == "inversor":
-                response = investor_agent(message)
-            elif agent_name == "creativo":
-                response = creative_agent(message)
-            else:
-                response = "Agente no reconocido."
+            response = agent_fn(message)
 
             # Guardar chat en DB
             chat = Chat(
-                user_id=user.id,
-                agent_id=agent.id,
+                user_id=user_id,
+                agent_id=agent_id,
                 message=message,
                 response=response,
                 status="sent",
                 content_type="text",
                 language="es",
-                tokens_used=len(message.split()),  # métrica simple de tokens
+                tokens_used=len(message.split()),
                 created_at=datetime.datetime.utcnow()
             )
             db.add(chat)
@@ -133,7 +117,7 @@ def create_chat(
             db.refresh(chat)
 
             # Auditoría
-            log_chat_creation(user=user, chat=chat, db=db)
+            log_chat_creation(user=current_user, chat=chat, db=db)
 
             # Cachear respuesta
             set_cache(f"chat:{chat.id}", chat.response)
@@ -142,7 +126,7 @@ def create_chat(
             metrics.record_request("POST", endpoint)
             metrics.record_latency(endpoint, time.time() - start)
 
-            logger.info(f"[CHAT] Nuevo chat creado | user={user.email} agent={agent.name}")
+            logger.info(f"[CHAT] Nuevo chat creado | user={current_user.email} agent={agent_id}")
 
             return chat.to_dict()
         except Exception as e:
