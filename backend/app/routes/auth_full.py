@@ -14,16 +14,14 @@ import os
 from app.db.postgresql import get_db
 from app.models.user import User
 from app.utils.logger import get_logger
-from app.config import settings  # usamos tu Settings global
+from app.config import settings
 
-# --- Inicialización ---
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = get_logger("auth")
 
-# Cargar variables de entorno en UTF-8
-load_dotenv(".env")
+# --- Configuración ---
+load_dotenv(".env")  # fuerza lectura en UTF-8
 
-# Configuración JWT desde settings
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.TOKEN_EXPIRATION_HOURS
@@ -54,13 +52,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 # --- Login con protección ---
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit("5/minute")  # máximo 5 intentos por minuto por IP
+@limiter.limit("5/minute")
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    """
-    Login real con email + password contra PostgreSQL.
-    Valida con bcrypt y devuelve JWT.
-    Protegido contra fuerza bruta con rate limiting.
-    """
     user: User | None = db.query(User).filter(User.email == data.email).first()
     if not user:
         logger.warning(f"[AUTH] Intento de login con email inexistente: {data.email}")
