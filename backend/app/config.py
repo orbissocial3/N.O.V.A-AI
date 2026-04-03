@@ -1,16 +1,8 @@
 """
 Configuración global de N.O.V.A
 --------------------------------
-Centraliza todas las variables de entorno y parámetros:
-- Seguridad
-- Bases de datos
-- Pagos
-- Logs
-- Correo electrónico
-- Almacenamiento
-- APIs externas
-- Internacionalización
-- Empresarial
+El magnetar de la plataforma: centraliza todas las variables de entorno
+y parámetros con precisión milimétrica.
 """
 
 import os
@@ -48,7 +40,6 @@ class Settings(BaseSettings):
     PAYPAL_CLIENT_ID: str = Field(default=os.getenv("PAYPAL_CLIENT_ID", ""))
     PAYPAL_SECRET: str = Field(default=os.getenv("PAYPAL_SECRET", ""))
     STRIPE_API_KEY: str = Field(default=os.getenv("STRIPE_API_KEY", ""))
-    GOOGLE_PLAY_KEY: str = Field(default=os.getenv("GOOGLE_PLAY_KEY", ""))
 
     # --- Logs ---
     LOG_LEVEL: str = Field(default=os.getenv("LOG_LEVEL", "INFO"))
@@ -76,7 +67,7 @@ class Settings(BaseSettings):
     GOOGLE_SEARCH_API_KEY: str = Field(default=os.getenv("GOOGLE_SEARCH_API_KEY", ""))
     GOOGLE_SEARCH_ENGINE_ID: str = Field(default=os.getenv("GOOGLE_SEARCH_ENGINE_ID", ""))
 
-    # --- Wikimedia por idioma (campos individuales) ---
+    # --- Wikimedia por idioma ---
     WIKIMEDIA_API_ES: str = Field(default=os.getenv("WIKIMEDIA_API_ES", "https://es.wikipedia.org/api/rest_v1/page/summary/"))
     WIKIMEDIA_API_EN: str = Field(default=os.getenv("WIKIMEDIA_API_EN", "https://en.wikipedia.org/api/rest_v1/page/summary/"))
     WIKIMEDIA_API_IT: str = Field(default=os.getenv("WIKIMEDIA_API_IT", "https://it.wikipedia.org/api/rest_v1/page/summary/"))
@@ -85,7 +76,6 @@ class Settings(BaseSettings):
     WIKIMEDIA_API_ZH: str = Field(default=os.getenv("WIKIMEDIA_API_ZH", "https://zh.wikipedia.org/api/rest_v1/page/summary/"))
     WIKIMEDIA_API_PT: str = Field(default=os.getenv("WIKIMEDIA_API_PT", "https://pt.wikipedia.org/api/rest_v1/page/summary/"))
 
-    # Diccionario centralizado
     @property
     def WIKIMEDIA_ENDPOINTS(self) -> Dict[str, str]:
         return {
@@ -103,7 +93,6 @@ class Settings(BaseSettings):
     GITHUB_API_TOKEN: str = Field(default=os.getenv("GITHUB_API_TOKEN", ""))
     STACKEXCHANGE_API_KEY: str = Field(default=os.getenv("STACKEXCHANGE_API_KEY", ""))
 
-    # NASA
     NASA_API_KEY: str = Field(default=os.getenv("NASA_API_KEY", ""))
 
     # --- Internacionalización ---

@@ -6,10 +6,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from jose import jwt
 from passlib.context import CryptContext
-from slowapi import Limiter
 from slowapi.util import get_remote_address
 from dotenv import load_dotenv
-import os
 
 from app.db.postgresql import get_db
 from app.models.user import User
@@ -27,9 +25,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.TOKEN_EXPIRATION_HOURS
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# Rate limiting (anti fuerza bruta) sin lectura de .env
-limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
 
 # --- Modelos ---
 class LoginRequest(BaseModel):
@@ -52,7 +47,6 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 # --- Login con protección ---
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit("5/minute")
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user: User | None = db.query(User).filter(User.email == data.email).first()
     if not user:

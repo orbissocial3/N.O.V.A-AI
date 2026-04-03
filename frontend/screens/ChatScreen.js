@@ -2,14 +2,10 @@
  * ChatScreen.js
  * ----------------------------
  * Pantalla de chat principal de N.O.V.A
- * - Interfaz premium y empresarial
- * - Manejo de mensajes con FlatList optimizada
- * - Simulación de respuesta IA con delay
- * - Internacionalización con i18n
- * - Logging de eventos para observabilidad
+ * Premium, limpia y empresarial
  */
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -18,15 +14,17 @@ import {
   FlatList,
   StyleSheet,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Animated
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import logger from "../../services/logger"; // Logging centralizado
+import logger from "../../services/logger";
 
 export default function ChatScreen() {
   const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -35,7 +33,14 @@ export default function ChatScreen() {
     setMessages((prev) => [...prev, newMessage]);
     logger.info(`[CHAT] Mensaje enviado: ${message}`);
 
-    // Simulación de respuesta del agente IA
+    // Animación de entrada
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true
+    }).start();
+
+    // Simulación de respuesta IA
     setTimeout(() => {
       const agentReply = {
         id: Date.now().toString(),
@@ -44,15 +49,20 @@ export default function ChatScreen() {
       };
       setMessages((prev) => [...prev, agentReply]);
       logger.info("[CHAT] Respuesta del agente IA simulada");
-    }, 1000);
+    }, 1200);
 
     setMessage("");
   };
 
   const renderMessage = ({ item }) => (
-    <View style={item.sender === "user" ? styles.userBubble : styles.agentBubble}>
+    <Animated.View
+      style={[
+        item.sender === "user" ? styles.userBubble : styles.agentBubble,
+        { opacity: fadeAnim }
+      ]}
+    >
       <Text style={styles.messageText}>{item.text}</Text>
-    </View>
+    </Animated.View>
   );
 
   return (
@@ -71,6 +81,7 @@ export default function ChatScreen() {
         <TextInput
           style={styles.input}
           placeholder={t("chat.inputPlaceholder")}
+          placeholderTextColor="#888"
           value={message}
           onChangeText={setMessage}
         />
@@ -83,49 +94,65 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F9F9F9", padding: 20 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10, color: "#333" },
+  container: { flex: 1, backgroundColor: "#0A0F2C", padding: 20 },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#00CFFF",
+    textAlign: "center",
+    letterSpacing: 1.2
+  },
   chatContainer: { flexGrow: 1, justifyContent: "flex-end" },
   userBubble: {
     alignSelf: "flex-end",
-    backgroundColor: "#DCF8C6",
-    padding: 10,
-    borderRadius: 12,
-    marginVertical: 4,
-    maxWidth: "80%"
+    backgroundColor: "#00CFFF",
+    padding: 12,
+    borderRadius: 16,
+    marginVertical: 6,
+    maxWidth: "80%",
+    shadowColor: "#00CFFF",
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4
   },
   agentBubble: {
     alignSelf: "flex-start",
-    backgroundColor: "#EEE",
-    padding: 10,
-    borderRadius: 12,
-    marginVertical: 4,
-    maxWidth: "80%"
+    backgroundColor: "#1B1B2F",
+    padding: 12,
+    borderRadius: 16,
+    marginVertical: 6,
+    maxWidth: "80%",
+    shadowColor: "#333",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2
   },
-  messageText: { fontSize: 16, color: "#333" },
+  messageText: { fontSize: 16, color: "#FFF" },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
     borderTopWidth: 1,
-    borderColor: "#DDD",
+    borderColor: "#222",
     paddingTop: 8
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 20,
+    borderColor: "#333",
+    borderRadius: 25,
     paddingHorizontal: 15,
-    paddingVertical: 8,
+    paddingVertical: 10,
     marginRight: 10,
-    backgroundColor: "#FFF"
+    backgroundColor: "#111",
+    color: "#FFF"
   },
   sendButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 20,
+    backgroundColor: "#00CFFF",
+    borderRadius: 25,
     paddingHorizontal: 20,
     paddingVertical: 10
   },
-  sendButtonText: { color: "#FFF", fontWeight: "bold" }
+  sendButtonText: { color: "#0A0F2C", fontWeight: "bold", fontSize: 16 }
 });

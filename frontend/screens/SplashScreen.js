@@ -2,10 +2,7 @@
  * SplashScreen.js
  * ----------------------------
  * Pantalla inicial de N.O.V.A
- * - Fondo degradado premium (azul → púrpura)
- * - Logo y nombre con animación elegante
- * - Loader en cian brillante
- * - Footer estilo META con branding corporativo
+ * Premium, vibrante y oscura
  */
 
 import React, { useEffect, useRef } from "react";
@@ -17,13 +14,14 @@ import {
   Animated,
   Image
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient"; // para el degradado
+import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 
 export default function SplashScreen() {
   const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const blinkAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -37,16 +35,30 @@ export default function SplashScreen() {
         friction: 4,
         tension: 40,
         useNativeDriver: true
-      })
+      }),
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(blinkAnim, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: true
+          }),
+          Animated.timing(blinkAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true
+          })
+        ])
+      )
     ]).start();
   }, []);
 
   return (
     <LinearGradient
-      colors={["#0A0F2C", "#3B0A45"]} // azul profundo → púrpura premium
+      colors={["#0A0F2C", "#3B0A45", "#0ACFFF"]} // azul → púrpura → cian eléctrico
       style={styles.container}
     >
-      {/* Animación de logo y nombre */}
+      {/* Logo y nombre */}
       <Animated.View
         style={{
           opacity: fadeAnim,
@@ -65,16 +77,20 @@ export default function SplashScreen() {
 
       {/* Loader premium */}
       <ActivityIndicator size="large" color="#00CFFF" style={{ marginTop: 30 }} />
-      <Text style={styles.text}>{t("app.loading")}</Text>
+      <Animated.Text style={[styles.text, { opacity: blinkAnim }]}>
+        {t("app.loading")}
+      </Animated.Text>
 
-      {/* Footer estilo META */}
+      {/* Footer corporativo */}
       <View style={styles.footer}>
         <Image
           source={require("../assets/logo.png")}
           style={styles.footerLogo}
           resizeMode="contain"
         />
-        <Text style={styles.footerText}>From Nova Artificial Intelligence Systems</Text>
+        <Text style={styles.footerText}>
+          From: Nova Artificial Intelligence Systems
+        </Text>
       </View>
     </LinearGradient>
   );
@@ -82,11 +98,27 @@ export default function SplashScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  logo: { width: 160, height: 160, marginBottom: 15 },
-  title: { fontSize: 30, fontWeight: "bold", marginBottom: 5, color: "#fff", letterSpacing: 1 },
-  subtitle: { fontSize: 16, color: "#ddd", marginBottom: 20, textAlign: "center" },
+  logo: { width: 180, height: 180, marginBottom: 15 },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#fff",
+    letterSpacing: 1.5
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "#ddd",
+    marginBottom: 20,
+    textAlign: "center"
+  },
   text: { marginTop: 10, fontSize: 16, color: "#fff" },
-  footer: { position: "absolute", bottom: 40, flexDirection: "row", alignItems: "center" },
-  footerLogo: { width: 22, height: 22, marginRight: 8 },
+  footer: {
+    position: "absolute",
+    bottom: 40,
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  footerLogo: { width: 24, height: 24, marginRight: 8 },
   footerText: { color: "#bbb", fontSize: 14 }
 });

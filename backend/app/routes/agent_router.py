@@ -17,10 +17,10 @@ from app.routes.auth_full import get_current_user  # Import directo desde tu aut
 
 # Importar agentes
 from app.services.agents.student import student_agent
-from app.services.agents.investor import investor_agent
+from backend.app.services.agents.investor_premium import investor_agent
 from app.services.agents.secretary import secretary_agent
 from app.services.agents.programmer import programmer_agent
-from app.services.agents.creative import creative_agent
+from backend.app.services.agents.creative_premium import creative_agent
 
 logger = get_logger("agent_router")
 

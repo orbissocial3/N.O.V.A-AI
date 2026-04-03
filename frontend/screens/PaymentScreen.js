@@ -2,10 +2,7 @@
  * PaymentScreen.js
  * ----------------------------
  * Pantalla de pagos de N.O.V.A
- * - Diseño empresarial y premium
- * - Interacciones fluidas y atractivas
- * - Internacionalización con i18n
- * - Simulación de proceso de pago con feedback visual
+ * Premium, sobria y empresarial
  */
 
 import React, { useState } from "react";
@@ -14,21 +11,25 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  StyleSheet
+  StyleSheet,
+  Image
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import logger from "../services/logger"; // Observabilidad
+import logger from "../services/logger";
 
 export default function PaymentScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handlePayment = (method) => {
     logger.info(`[PAYMENT] Iniciando pago con ${method}`);
     setLoading(true);
+    setSuccess(false);
     setTimeout(() => {
       setLoading(false);
-      alert(t("payment.success"));
+      setSuccess(true);
       logger.info(`[PAYMENT] Pago exitoso con ${method}`);
     }, 2000);
   };
@@ -43,10 +44,16 @@ export default function PaymentScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={["#0A0F2C", "#3B0A45", "#0ACFFF"]}
+      style={styles.container}
+    >
       <Text style={styles.title}>{t("payment.title")}</Text>
+
       {loading ? (
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#00CFFF" style={{ marginTop: 20 }} />
+      ) : success ? (
+        <Text style={styles.successText}>{t("payment.success")}</Text>
       ) : (
         <View style={styles.buttons}>
           <PaymentButton
@@ -59,29 +66,58 @@ export default function PaymentScreen() {
             method="Stripe"
             color="#635BFF"
           />
-          <PaymentButton
-            title={t("payment.googlePlay")}
-            method="Google Play"
-            color="#34A853"
-          />
         </View>
       )}
-    </View>
+
+      {/* Footer corporativo */}
+      <View style={styles.footer}>
+        <Image
+          source={require("../assets/logo.png")}
+          style={styles.footerLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.footerText}>
+          From: Nova Artificial Intelligence Systems
+        </Text>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center", backgroundColor: "#F9FAFB" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 30, textAlign: "center", color: "#1A1A1A" },
-  buttons: { gap: 15 },
+  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 30,
+    textAlign: "center",
+    color: "#FFF",
+    letterSpacing: 1.5
+  },
+  buttons: { width: "100%", gap: 15 },
   button: {
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4
   },
-  buttonText: { color: "#FFF", fontSize: 16, fontWeight: "600" }
+  buttonText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
+  successText: {
+    fontSize: 18,
+    color: "#00CFFF",
+    fontWeight: "600",
+    marginTop: 20,
+    textAlign: "center"
+  },
+  footer: {
+    position: "absolute",
+    bottom: 30,
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  footerLogo: { width: 22, height: 22, marginRight: 8 },
+  footerText: { color: "#BBB", fontSize: 14 }
 });

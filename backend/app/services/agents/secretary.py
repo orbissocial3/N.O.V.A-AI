@@ -1,62 +1,87 @@
-# backend/app/services/agents/secretary_premium.py
+# backend/app/services/agents/secretary.py
 """
-Agente Secretario Premium
+Agente Secretario N.O.V.A
 -------------------------
-Funciones avanzadas:
- - Redacción de correos (Gmail/Outlook API)
- - Búsqueda local de archivos (Google Drive/OneDrive)
- - Análisis de dashboards ejecutivos (Power BI/Tableau)
+Dos modos disponibles:
+ - Free: organización básica
+ - Premium: productividad ejecutiva avanzada
 """
 
 import random
-import os
-import requests
 from app.utils.logger import get_logger
 
-logger = get_logger("secretary_premium_agent")
+logger = get_logger("secretary_agent")
 
-RESPONSES = {
-    "correo": [
-        "He redactado tu correo, ¿quieres que lo envíe por Gmail o Outlook?",
-        "El mensaje está listo, puedes revisarlo antes de enviarlo.",
-        "He preparado un borrador con tono profesional."
+RESPONSES_FREE = {
+    "reunion": [
+        "📅 He agendado tu reunión en la lista de pendientes.",
+        "🗓️ Recuerda tu reunión, puedo enviarte un recordatorio."
     ],
-    "archivo": [
-        "He buscado en tu almacenamiento, encontré coincidencias en Google Drive.",
-        "Tu archivo está disponible en OneDrive, ¿quieres abrirlo?",
-        "He localizado documentos relacionados con tu búsqueda."
-    ],
-    "dashboard": [
-        "He analizado tu dashboard ejecutivo, aquí tienes un resumen de métricas clave.",
-        "Los datos muestran tendencias de crecimiento en el último trimestre.",
-        "Sugiero enfocarte en los KPIs con mayor impacto."
+    "tarea": [
+        "📝 He registrado tu tarea en la lista de pendientes.",
+        "✅ Tu tarea está anotada, no la olvidarás."
     ],
     "default": [
-        "Soy tu agente secretario premium, puedo redactar correos, buscar archivos y analizar dashboards.",
-        "¿Quieres que prepare un informe ejecutivo con tus datos?",
-        "Puedo ayudarte a coordinar tareas avanzadas de productividad."
+        "🤖 Soy tu agente secretario FREE: organizo tu tiempo y registro tus tareas básicas.",
+        "📑 Puedo ayudarte a coordinar reuniones y tareas simples."
     ]
 }
 
-def secretary_premium_agent(message: str) -> str:
+RESPONSES_PREMIUM = {
+    "correo": [
+        "📧 He redactado tu correo con tono ejecutivo, listo para enviar por Gmail o Outlook.",
+        "✉️ El mensaje está preparado con formato corporativo, ¿quieres que lo envíe?",
+        "📝 He generado un borrador profesional adaptado a tu contexto."
+    ],
+    "archivo": [
+        "📂 He buscado en tu almacenamiento y encontré coincidencias en Google Drive.",
+        "📁 Tu archivo está disponible en OneDrive, ¿quieres abrirlo?",
+        "🔎 He localizado documentos relevantes y puedo generar un resumen ejecutivo."
+    ],
+    "dashboard": [
+        "📊 He analizado tu dashboard en Power BI, aquí tienes un resumen de métricas clave.",
+        "📈 Los datos muestran tendencias de crecimiento en el último trimestre.",
+        "🎯 Sugiero enfocarte en los KPIs con mayor impacto."
+    ],
+    "agenda": [
+        "📆 He sincronizado tu calendario y propuesto horarios óptimos para tu reunión.",
+        "📨 Invitaciones enviadas con agenda adjunta.",
+        "🗂️ He coordinado la reunión y preparado un informe previo."
+    ],
+    "default": [
+        "🚀 Soy tu agente secretario PREMIUM N.O.V.A: gestiono correos, archivos, dashboards y reuniones.",
+        "📑 Puedo preparar informes ejecutivos con tus datos.",
+        "🗂️ Coordino tareas avanzadas de productividad y alertas críticas."
+    ]
+}
+
+def secretary_agent(message: str, mode: str = "free") -> str:
     """
-    Procesa un mensaje del usuario y devuelve una respuesta avanzada.
-    Integra APIs externas según la intención detectada.
+    Agente secretario con dos modos:
+    - free: respuestas básicas
+    - premium: funciones avanzadas
     """
     msg = message.lower()
-    logger.info(f"[SECRETARY PREMIUM] Procesando mensaje: {msg}")
+    logger.info(f"[SECRETARY] Procesando mensaje: {msg} | modo={mode}")
 
-    if "correo" in msg or "email" in msg:
-        # Aquí integrarías Gmail/Outlook API
-        response = random.choice(RESPONSES["correo"])
-    elif "archivo" in msg or "documento" in msg:
-        # Aquí integrarías Google Drive/OneDrive API
-        response = random.choice(RESPONSES["archivo"])
-    elif "dashboard" in msg or "ejecutivo" in msg:
-        # Aquí integrarías Power BI/Tableau API
-        response = random.choice(RESPONSES["dashboard"])
-    else:
-        response = random.choice(RESPONSES["default"])
+    if mode == "premium":
+        if "correo" in msg or "email" in msg:
+            response = random.choice(RESPONSES_PREMIUM["correo"])
+        elif "archivo" in msg or "documento" in msg:
+            response = random.choice(RESPONSES_PREMIUM["archivo"])
+        elif "dashboard" in msg or "ejecutivo" in msg:
+            response = random.choice(RESPONSES_PREMIUM["dashboard"])
+        elif "agenda" in msg or "reunion" in msg or "meeting" in msg:
+            response = random.choice(RESPONSES_PREMIUM["agenda"])
+        else:
+            response = random.choice(RESPONSES_PREMIUM["default"])
+    else:  # modo free
+        if "reunion" in msg or "meeting" in msg:
+            response = random.choice(RESPONSES_FREE["reunion"])
+        elif "tarea" in msg or "task" in msg:
+            response = random.choice(RESPONSES_FREE["tarea"])
+        else:
+            response = random.choice(RESPONSES_FREE["default"])
 
-    logger.debug(f"[SECRETARY PREMIUM] Respuesta generada: {response}")
+    logger.debug(f"[SECRETARY] Respuesta generada: {response}")
     return response

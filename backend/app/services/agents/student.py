@@ -1,11 +1,13 @@
+# backend/app/services/agents/student.py
 """
-Agente Estudiante Premium
+Agente Estudiante N.O.V.A
 -------------------------
-Funciones avanzadas:
+Gratis pero incomparable:
  - Resúmenes académicos (Wikipedia/Open Library)
  - Explicaciones científicas y matemáticas (Wolfram Alpha)
- - Astronomía y astrología (NASA APIs)
+ - Astronomía y espacio (NASA APIs)
  - Ayuda con tareas y ejercicios prácticos
+ - Validación cruzada de fuentes
 """
 
 import os
@@ -38,7 +40,6 @@ def fetch_wikipedia_summary(topic: str) -> str:
         logger.error(f"[STUDENT] Error Wikipedia: {e}")
         return "No pude obtener información en Wikipedia en este momento."
 
-
 def fetch_openlibrary_books(query: str) -> str:
     """Busca referencias académicas en Open Library."""
     try:
@@ -54,7 +55,6 @@ def fetch_openlibrary_books(query: str) -> str:
         logger.error(f"[STUDENT] Error OpenLibrary: {e}")
         return "No pude obtener referencias académicas en este momento."
 
-
 def fetch_wolfram_answer(query: str) -> str:
     """Resuelve consultas científicas y matemáticas con Wolfram Alpha."""
     try:
@@ -67,7 +67,6 @@ def fetch_wolfram_answer(query: str) -> str:
     except Exception as e:
         logger.error(f"[STUDENT] Error Wolfram: {e}")
         return "No pude resolver la consulta científica."
-
 
 def fetch_nasa_info(date: str = None, hd: bool = False) -> str:
     """Obtiene información astronómica desde NASA (APOD)."""
@@ -90,7 +89,6 @@ def fetch_nasa_info(date: str = None, hd: bool = False) -> str:
         logger.error(f"[STUDENT] Error NASA: {e}")
         return "No pude obtener información astronómica."
 
-
 # -----------------------------
 # Agente principal
 # -----------------------------
@@ -102,7 +100,9 @@ def student_agent(message: str) -> str:
 
     if "resumen" in msg:
         topic = msg.replace("resumen", "").strip() or "Education"
-        return fetch_wikipedia_summary(topic)
+        wiki = fetch_wikipedia_summary(topic)
+        books = fetch_openlibrary_books(topic)
+        return f"{wiki}\n\n{books}"
 
     elif "libro" in msg or "referencia" in msg:
         query = msg.replace("libro", "").replace("referencia", "").strip() or "Science"
@@ -110,7 +110,9 @@ def student_agent(message: str) -> str:
 
     elif "explica" in msg or "explicación" in msg:
         query = msg.replace("explica", "").replace("explicación", "").strip() or "photosynthesis"
-        return fetch_wolfram_answer(query)
+        wolfram = fetch_wolfram_answer(query)
+        wiki = fetch_wikipedia_summary(query)
+        return f"{wolfram}\n\n{wiki}"
 
     elif "astronomía" in msg or "astrología" in msg or "espacio" in msg:
         return fetch_nasa_info()
@@ -127,7 +129,7 @@ def student_agent(message: str) -> str:
 
     else:
         return (
-            "🎓 Soy tu agente estudiante. Puedo generar resúmenes académicos, "
+            "🎓 Soy tu agente estudiante N.O.V.A. Gratis pero incomparable: genero resúmenes académicos, "
             "explicaciones científicas y matemáticas, referencias de libros, información astronómica "
-            "y ayudarte con tus tareas prácticas."
+            "y te ayudo con tus tareas prácticas. El conocimiento es la base de la vida."
         )

@@ -26,8 +26,8 @@ from app.cache.redis_cache import set_cache, get_cache, delete_cache
 from app.services.agents.student import student_agent
 from app.services.agents.programmer import programmer_agent
 from app.services.agents.secretary import secretary_agent
-from app.services.agents.investor import investor_agent
-from app.services.agents.creative import creative_agent
+from backend.app.services.agents.investor_premium import investor_agent
+from backend.app.services.agents.creative_premium import creative_agent
 
 import datetime, time
 

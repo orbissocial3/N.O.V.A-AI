@@ -2,11 +2,7 @@
  * LoginScreen.js
  * ----------------------------
  * Pantalla de inicio de sesión de N.O.V.A
- * - Diseño empresarial y premium
- * - Validaciones claras y seguras
- * - Interacciones fluidas y atractivas
- * - Internacionalización con i18n
- * - Experiencia digna de la mejor IA
+ * Premium, empresarial y atractiva
  */
 
 import React, { useState } from "react";
@@ -17,8 +13,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Image
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import auth from "../services/auth";
 import logger from "../services/logger";
@@ -27,10 +25,11 @@ export default function LoginScreen({ navigation }) {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     if (!email.includes("@") || password.length < 6) {
-      alert(t("auth.invalidCredentials"));
+      setError(t("auth.invalidCredentials"));
       logger.warning("[LOGIN] Credenciales inválidas");
       return;
     }
@@ -41,87 +40,129 @@ export default function LoginScreen({ navigation }) {
         logger.info("[LOGIN] Sesión iniciada correctamente");
         navigation.replace("Home");
       } else {
-        alert(t("auth.invalidCredentials"));
+        setError(t("auth.invalidCredentials"));
         logger.error("[LOGIN] Fallo en autenticación");
       }
     } catch (error) {
       logger.error("[LOGIN] Error inesperado", error);
-      alert(t("auth.serverError"));
+      setError(t("auth.serverError"));
     }
   };
 
   return (
-    <KeyboardAvoidingView
+    <LinearGradient
+      colors={["#0A0F2C", "#3B0A45", "#0ACFFF"]}
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text style={styles.title}>{t("auth.login")}</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder={t("auth.email")}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder={t("auth.password")}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>{t("auth.login")}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.googleButton}
-        onPress={() => alert("Google OAuth")}
+      <KeyboardAvoidingView
+        style={styles.innerContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <Text style={styles.googleButtonText}>{t("auth.googleLogin")}</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+        {/* Logo */}
+        <Image
+          source={require("../assets/logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+
+        <Text style={styles.title}>{t("auth.login")}</Text>
+
+        {/* Inputs */}
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          placeholder={t("auth.email")}
+          placeholderTextColor="#888"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <TextInput
+          style={[styles.input, error && styles.inputError]}
+          placeholder={t("auth.password")}
+          placeholderTextColor="#888"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        {/* Botón Login */}
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>{t("auth.login")}</Text>
+        </TouchableOpacity>
+
+        {/* Botón Google OAuth */}
+        <TouchableOpacity
+          style={styles.googleButton}
+          onPress={() => alert("Google OAuth")}
+        >
+          <Text style={styles.googleButtonText}>{t("auth.googleLogin")}</Text>
+        </TouchableOpacity>
+
+        {/* Footer corporativo */}
+        <View style={styles.footer}>
+          <Image
+            source={require("../assets/logo.png")}
+            style={styles.footerLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.footerText}>
+            From: Nova Artificial Intelligence Systems
+          </Text>
+        </View>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center", backgroundColor: "#F9FAFB" },
-  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: "#1A1A1A" },
+  container: { flex: 1 },
+  innerContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  logo: { width: 120, height: 120, marginBottom: 20 },
+  title: { fontSize: 28, fontWeight: "bold", marginBottom: 20, color: "#FFF", letterSpacing: 1.5 },
   input: {
+    width: "100%",
     borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 10,
+    borderColor: "#444",
+    borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 12,
     marginBottom: 15,
-    backgroundColor: "#FFF",
-    fontSize: 16
+    backgroundColor: "#111",
+    fontSize: 16,
+    color: "#FFF"
   },
+  inputError: { borderColor: "#FF4D4D" },
+  errorText: { color: "#FF4D4D", marginBottom: 10 },
   loginButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#00CFFF",
     paddingVertical: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    width: "100%",
+    shadowColor: "#00CFFF",
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4
   },
-  loginButtonText: { color: "#FFF", fontSize: 16, fontWeight: "600" },
+  loginButtonText: { color: "#0A0F2C", fontSize: 16, fontWeight: "700" },
   googleButton: {
     backgroundColor: "#DB4437",
     paddingVertical: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    width: "100%",
+    shadowColor: "#DB4437",
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4
   },
-  googleButtonText: { color: "#FFF", fontSize: 16, fontWeight: "600" }
+  googleButtonText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
+  footer: { position: "absolute", bottom: 30, flexDirection: "row", alignItems: "center" },
+  footerLogo: { width: 22, height: 22, marginRight: 8 },
+  footerText: { color: "#BBB", fontSize: 14 }
 });
