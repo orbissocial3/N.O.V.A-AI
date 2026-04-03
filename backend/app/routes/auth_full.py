@@ -8,19 +8,20 @@ from jose import jwt
 from passlib.context import CryptContext
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from starlette.config import Config
+from dotenv import load_dotenv
+import os
 
 from app.db.postgresql import get_db
 from app.models.user import User
 from app.utils.logger import get_logger
 from app.config import settings  # usamos tu Settings global
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["auth"]
-)
-
+# --- Inicialización ---
+router = APIRouter(prefix="/auth", tags=["auth"])
 logger = get_logger("auth")
+
+# Cargar variables de entorno en UTF-8
+load_dotenv(".env")
 
 # Configuración JWT desde settings
 SECRET_KEY = settings.SECRET_KEY
@@ -29,9 +30,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.TOKEN_EXPIRATION_HOURS
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Rate limiting (anti fuerza bruta) con lectura UTF-8 del .env
-config = Config(".env", encoding="utf-8")
-limiter = Limiter(key_func=get_remote_address, config=config)
+# Rate limiting (anti fuerza bruta)
+limiter = Limiter(key_func=get_remote_address)
 
 # --- Modelos ---
 class LoginRequest(BaseModel):
@@ -61,7 +61,6 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     Valida con bcrypt y devuelve JWT.
     Protegido contra fuerza bruta con rate limiting.
     """
-
     user: User | None = db.query(User).filter(User.email == data.email).first()
     if not user:
         logger.warning(f"[AUTH] Intento de login con email inexistente: {data.email}")
@@ -79,18 +78,8 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
 # --- Esqueleto para OAuth2 con Google ---
 @router.get("/google/login")
 def google_login():
-    """
-    Punto de entrada para OAuth2 con Google.
-    Aquí normalmente rediriges al endpoint de autorización de Google.
-    """
     return {"detail": "Endpoint de inicio OAuth2 con Google (pendiente de implementación)"}
 
 @router.get("/google/callback")
 def google_callback(code: str, db: Session = Depends(get_db)):
-    """
-    Callback de Google OAuth2.
-    Aquí intercambias 'code' por tokens de Google, obtienes el perfil,
-    creas/actualizas el usuario en PostgreSQL y emites tu propio JWT.
-    """
-    # TODO: implementar integración real con Google
     return {"detail": "Callback de OAuth2 con Google (pendiente de implementación)"}
