@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from dotenv import load_dotenv
-import os
+import os 
 
 from app.db.postgresql import get_db
 from app.models.user import User
