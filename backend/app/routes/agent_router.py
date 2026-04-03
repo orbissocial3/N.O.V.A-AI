@@ -8,19 +8,21 @@ Router maestro de agentes IA en N.O.V.A
 - Logging empresarial para trazabilidad
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+from slowapi.util import get_remote_address
+
 from app.db.postgresql import get_db
 from app.utils.logger import get_logger
 from app.models.user import User
-from app.routes.auth_full import get_current_user  # Import directo desde tu auth_full.py
+from app.routes.auth_full import get_current_user
 
 # Importar agentes
 from app.services.agents.student import student_agent
-from backend.app.services.agents.investor_premium import investor_agent
+from app.services.agents.investor_premium import investor_agent
 from app.services.agents.secretary import secretary_agent
 from app.services.agents.programmer import programmer_agent
-from backend.app.services.agents.creative_premium import creative_agent
+from app.services.agents.creative_premium import creative_agent
 
 logger = get_logger("agent_router")
 
@@ -47,6 +49,7 @@ FREE_AGENTS = {"student"}
 def route_message(
     agent: str,
     message: str,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -56,10 +59,11 @@ def route_message(
     - Aplica control de plan (free/premium)
     - Ejecuta la lógica del agente
     """
+    ip = get_remote_address(request)
 
     # Validar agente
     if agent not in AGENTS:
-        logger.error(f"[ROUTER] Agente inválido solicitado: {agent}")
+        logger.error(f"[ROUTER] Agente inválido solicitado | agent={agent} ip={ip}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Agente no encontrado"
@@ -67,7 +71,7 @@ def route_message(
 
     # Control de acceso según plan
     if agent in PREMIUM_AGENTS and not current_user.is_premium:
-        logger.warning(f"[ROUTER] Acceso denegado | user={current_user.id} agent={agent}")
+        logger.warning(f"[ROUTER] Acceso denegado | user={current_user.id} agent={agent} ip={ip}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Este agente requiere plan premium"
@@ -75,7 +79,7 @@ def route_message(
 
     # Direccionar al agente correcto
     try:
-        logger.info(f"[ROUTER] Mensaje dirigido | user={current_user.id} agent={agent}")
+        logger.info(f"[ROUTER] Mensaje dirigido | user={current_user.id} agent={agent} ip={ip}")
         response = AGENTS[agent](message)
 
         return {
@@ -85,7 +89,7 @@ def route_message(
         }
 
     except Exception as e:
-        logger.error(f"[ROUTER] Error interno | agent={agent} error={e}")
+        logger.error(f"[ROUTER] Error interno | agent={agent} ip={ip} error={e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno en el router de agentes"

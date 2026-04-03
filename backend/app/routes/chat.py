@@ -20,7 +20,7 @@ from app.utils.logger import get_logger
 # Auditoría, métricas, trazabilidad y alertas
 from app.middleware.audit import log_chat_creation
 from app.monitoring import metrics, tracing, alerts
-from app.cache.redis_cache import set_cache, get_cache, delete_cache
+from app.cache.redis_cache import set_cache
 
 # Importar servicios de agentes IA
 from app.services.agents.student import student_agent
@@ -60,9 +60,7 @@ def get_user_chats(
     chats = db.query(Chat).filter(Chat.user_id == user_id).all()
     logger.info(f"[CHAT] Historial consultado | user={user.email} total={len(chats)}")
 
-    # Métricas
     metrics.record_request("GET", "/chat/{user_id}")
-
     return [chat.to_dict() for chat in chats]
 
 # --- Crear un nuevo chat ---
@@ -77,10 +75,8 @@ def create_chat(
     """
     Crear un nuevo chat con persistencia y auditoría.
     """
-    # Rate limit
     check_rate_limit(user_id)
 
-    # Seleccionar agente IA
     agent_map = {
         1: student_agent,
         2: programmer_agent,
@@ -100,7 +96,6 @@ def create_chat(
         try:
             response = agent_fn(message)
 
-            # Guardar chat en DB
             chat = Chat(
                 user_id=user_id,
                 agent_id=agent_id,
@@ -113,24 +108,21 @@ def create_chat(
                 created_at=datetime.datetime.utcnow()
             )
             db.add(chat)
-            db.commit()
+            db.flush()   # asegura ID antes de refresh
             db.refresh(chat)
+            db.commit()
 
-            # Auditoría
             log_chat_creation(user=current_user, chat=chat, db=db)
-
-            # Cachear respuesta
             set_cache(f"chat:{chat.id}", chat.response)
 
-            # Métricas
             metrics.record_request("POST", endpoint)
             metrics.record_latency(endpoint, time.time() - start)
 
             logger.info(f"[CHAT] Nuevo chat creado | user={current_user.email} agent={agent_id}")
-
             return chat.to_dict()
+
         except Exception as e:
-            metrics.record_error(endpoint)
+            metrics.record_error(endpoint, severity="CRITICAL")
             alerts.send_alert(f"Error creando chat: {str(e)}", severity="CRITICAL")
             logger.error(f"[CHAT] Error al crear chat | user={user_id} agent={agent_id} error={e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error creando chat")

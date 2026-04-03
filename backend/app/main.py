@@ -28,7 +28,7 @@ if TESTING:
     from app.routes import chat as chat_router
 else:
     from app.routes import auth_full as auth_router
-    from backend.app.routes import chat as chat_router
+    from app.routes import chat as chat_router   # ✅ corregido
 
 # Rutas fijas
 from app.routes import plans, agents, admin

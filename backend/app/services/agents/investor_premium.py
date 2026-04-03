@@ -1,4 +1,3 @@
-# backend/app/services/agents/investor_premium.py
 """
 Agente Inversor Premium N.O.V.A
 -------------------------------
@@ -80,7 +79,6 @@ def sector_opportunities() -> str:
 
 def analyze_trends(symbol: str) -> str:
     """Análisis básico de tendencias de una acción."""
-    # Aquí podrías integrar librerías de análisis técnico (TA-Lib, etc.)
     return f"📈 Tendencia de {symbol}: Señales de soporte y resistencia detectadas, posible consolidación en corto plazo."
 
 # -----------------------------
@@ -108,3 +106,6 @@ def investor_premium_agent(message: str) -> str:
             "💹 Te ofrezco precios en tiempo real, análisis de riesgos, oportunidades sectoriales, tendencias gráficas y noticias verificadas.\n"
             "⚠️ Recuerda: no garantizo resultados, pero siempre te daré información confiable y estratégica."
         )
+
+# Alias para compatibilidad con chat.py
+investor_agent = investor_premium_agent
