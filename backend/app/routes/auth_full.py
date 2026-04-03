@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from dotenv import load_dotenv
-import os 
+import os
 
 from app.db.postgresql import get_db
 from app.models.user import User
@@ -28,8 +28,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.TOKEN_EXPIRATION_HOURS
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Rate limiting (anti fuerza bruta)
-limiter = Limiter(key_func=get_remote_address)
+# Rate limiting (anti fuerza bruta) sin lectura de .env
+limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
 
 # --- Modelos ---
 class LoginRequest(BaseModel):
