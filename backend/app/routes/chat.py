@@ -11,7 +11,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.postgresql import get_db
 from app.models.chat import Chat
-from app.models.agent import Agent
 from app.models.user import User
 from app.utils.security import get_current_user
 from app.utils.rate_limits import check_rate_limit
@@ -27,7 +26,7 @@ from app.services.agents.student import student_agent
 from app.services.agents.programmer import programmer_agent
 from app.services.agents.secretary import secretary_agent
 from app.services.agents.investor_premium import investor_agent
-from app.services.agents.creative_premium import creative_agent
+from app.services.agents.creative_premium import creative_agent  # ✅ alias corregido en creative_premium.py
 
 import datetime, time
 
@@ -122,6 +121,7 @@ def create_chat(
             return chat.to_dict()
 
         except Exception as e:
+            db.rollback()
             metrics.record_error(endpoint, severity="CRITICAL")
             alerts.send_alert(f"Error creando chat: {str(e)}", severity="CRITICAL")
             logger.error(f"[CHAT] Error al crear chat | user={user_id} agent={agent_id} error={e}")

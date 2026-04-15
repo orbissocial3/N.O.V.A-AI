@@ -31,7 +31,7 @@ router = APIRouter(
 class AgentCreateRequest(BaseModel):
     name: str = Field(..., min_length=3, max_length=50)
     description: str = Field(..., min_length=10, max_length=255)
-    category: str = Field(..., regex="^(estudiante|programador|secretario|inversor|creativo)$")
+    category: str = Field(..., pattern="^(estudiante|programador|secretario|inversor|creativo)$")  # ✅ corregido
     is_premium: bool = False
 
     @validator("name")
@@ -54,10 +54,6 @@ class AgentResponse(BaseModel):
 # --- Endpoints ---
 @router.get("/", response_model=List[AgentResponse])
 def list_agents(request: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """
-    Lista todos los agentes activos.
-    Solo accesible por usuarios autenticados.
-    """
     start = time.time()
     ip = get_remote_address(request)
     try:
@@ -75,10 +71,6 @@ def list_agents(request: Request, db: Session = Depends(get_db), current_user=De
 
 @router.post("/", response_model=AgentResponse, status_code=status.HTTP_201_CREATED)
 def create_agent(request: AgentCreateRequest, req: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """
-    Crea un nuevo agente IA.
-    Solo accesible por administradores.
-    """
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acceso denegado")
 
@@ -88,10 +80,7 @@ def create_agent(request: AgentCreateRequest, req: Request, db: Session = Depend
         with tracing.start_span("agents:create"):
             existing = db.query(Agent).filter(Agent.name == request.name).first()
             if existing:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Ya existe un agente con ese nombre"
-                )
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ya existe un agente con ese nombre")
 
             agent = Agent(**request.dict())
             db.add(agent)
@@ -114,10 +103,6 @@ def create_agent(request: AgentCreateRequest, req: Request, db: Session = Depend
 
 @router.delete("/{agent_id}", status_code=status.HTTP_200_OK)
 def delete_agent(agent_id: int, req: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """
-    Elimina un agente por ID.
-    Solo accesible por administradores.
-    """
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acceso denegado")
 

@@ -31,7 +31,7 @@ router = APIRouter(
 # --- Modelos Pydantic para validación ---
 class PlanCreateRequest(BaseModel):
     name: str = Field(..., min_length=3, max_length=50)
-    type: str = Field(..., regex="^(basic|premium|enterprise)$")
+    type: str = Field(..., pattern="^(basic|premium|enterprise)$")  # ✅ corregido
     price: float = Field(..., gt=0)
     duration_days: int = Field(..., gt=0, le=365)
     max_agents: int = Field(default=3, ge=1, le=50)
@@ -59,10 +59,6 @@ class PlanResponse(BaseModel):
 # --- Endpoints ---
 @router.get("/", response_model=List[PlanResponse])
 def list_plans(request: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """
-    Lista todos los planes activos.
-    Solo accesible por usuarios autenticados.
-    """
     start = time.time()
     ip = get_remote_address(request)
     try:
@@ -80,10 +76,6 @@ def list_plans(request: Request, db: Session = Depends(get_db), current_user=Dep
 
 @router.post("/", response_model=PlanResponse, status_code=status.HTTP_201_CREATED)
 def create_plan(request: PlanCreateRequest, req: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """
-    Crea un nuevo plan de suscripción.
-    Solo accesible por administradores.
-    """
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acceso denegado")
 
@@ -93,10 +85,7 @@ def create_plan(request: PlanCreateRequest, req: Request, db: Session = Depends(
         with tracing.start_span("plans:create"):
             existing = db.query(Plan).filter(Plan.name == request.name).first()
             if existing:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Ya existe un plan con ese nombre"
-                )
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ya existe un plan con ese nombre")
 
             plan = Plan(**request.dict())
             db.add(plan)
@@ -119,10 +108,6 @@ def create_plan(request: PlanCreateRequest, req: Request, db: Session = Depends(
 
 @router.delete("/{plan_id}", status_code=status.HTTP_200_OK)
 def delete_plan(plan_id: int, req: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """
-    Elimina un plan por ID.
-    Solo accesible por administradores.
-    """
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acceso denegado")
 

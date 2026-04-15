@@ -35,7 +35,7 @@ def generate_slogan(prompt: str) -> str:
         response = requests.post(OPENAI_API, json=payload, headers=headers, timeout=15)
         response.raise_for_status()
         data = response.json()
-        return data["choices"][0]["text"].strip()
+        return data.get("choices", [{}])[0].get("text", "").strip() or "No se generó slogan."
     except Exception as e:
         logger.error(f"[CREATIVE PREMIUM] Error OpenAI slogan: {e}")
         return "No pude generar un slogan en este momento."
@@ -48,7 +48,8 @@ def generate_image(prompt: str) -> str:
         response = requests.post(DALLE_API, json=payload, headers=headers, timeout=20)
         response.raise_for_status()
         data = response.json()
-        return f"🎨 Imagen generada: {data['data'][0]['url']}"
+        url = data.get("data", [{}])[0].get("url")
+        return f"🎨 Imagen generada: {url}" if url else "No se generó imagen."
     except Exception as e:
         logger.error(f"[CREATIVE PREMIUM] Error DALL·E: {e}")
         return "No pude generar una imagen en este momento."
@@ -80,19 +81,18 @@ def creative_premium_agent(message: str) -> str:
 
     if "slogan" in msg or "título" in msg:
         return generate_slogan(msg)
-
     elif "imagen" in msg or "foto" in msg or "visual" in msg:
         return generate_image(msg)
-
     elif "marketing" in msg or "campaña" in msg:
         return generate_campaign(msg)
-
     elif "idea" in msg or "brainstorm" in msg or "creativo" in msg:
         return brainstorming(msg)
-
     else:
         return (
             "👑 Soy tu agente creativo PREMIUM N.O.V.A: el rey del marketing y las ideas.\n"
             "🎨 Genero campañas hipercompletas, slogans memorables, imágenes hiperrealistas y estrategias de redes sociales.\n"
             "🔥 Soy el cerebro creativo del mundo, el sello de lo bello que es el arte."
         )
+
+# Alias para compatibilidad con chat.py
+creative_agent = creative_premium_agent
